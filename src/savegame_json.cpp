@@ -3032,7 +3032,7 @@ void mission::deserialize( JsonIn &jsin )
     jo.read( "npc_id", npc_id );
     jo.read( "good_fac_id", good_fac_id );
     jo.read( "bad_fac_id", bad_fac_id );
-
+    jo.read( "player_id", player_id );
 }
 
 void mission::serialize( JsonOut &json ) const
@@ -3996,7 +3996,7 @@ void submap::load( JsonIn &jsin, const std::string &member_name, int version )
             int rad_num = jsin.get_int();
             for( int i = 0; i < rad_num; ++i ) {
                 if( rad_cell < SEEX * SEEY ) {
-                    set_radiation( { 0 % SEEX, rad_cell / SEEX }, rad_strength );
+                    set_radiation( { rad_cell % SEEX, rad_cell / SEEX }, rad_strength );
                     rad_cell++;
                 }
             }

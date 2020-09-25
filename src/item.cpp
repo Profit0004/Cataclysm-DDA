@@ -6672,38 +6672,34 @@ const mtype *item::get_mtype() const
 
 float item::get_specific_heat_liquid() const
 {
-    if( is_corpse() ) {
-        return made_of_types()[0]->specific_heat_liquid();
+    if( is_comestible() ) {
+        return get_comestible()->specific_heat_liquid;
     }
-    // If it is not a corpse it is a food
-    return get_comestible()->specific_heat_liquid;
+    return made_of_types()[0]->specific_heat_liquid();
 }
 
 float item::get_specific_heat_solid() const
 {
-    if( is_corpse() ) {
-        return made_of_types()[0]->specific_heat_solid();
+    if( is_comestible() ) {
+        return get_comestible()->specific_heat_solid;
     }
-    // If it is not a corpse it is a food
-    return get_comestible()->specific_heat_solid;
+    return made_of_types()[0]->specific_heat_solid();
 }
 
 float item::get_latent_heat() const
 {
-    if( is_corpse() ) {
-        return made_of_types()[0]->latent_heat();
+    if( is_comestible() ) {
+        return get_comestible()->latent_heat;
     }
-    // If it is not a corpse it is a food
-    return get_comestible()->latent_heat;
+    return made_of_types()[0]->latent_heat();
 }
 
 float item::get_freeze_point() const
 {
-    if( is_corpse() ) {
-        return made_of_types()[0]->freeze_point();
+    if( is_comestible() ) {
+        return get_comestible()->freeze_point;
     }
-    // If it is not a corpse it is a food
-    return get_comestible()->freeze_point;
+    return made_of_types()[0]->freeze_point();
 }
 
 template<typename Item>
@@ -6898,6 +6894,11 @@ bool item::is_container_full( bool allow_bucket ) const
 bool item::can_unload_liquid() const
 {
     return contents.can_unload_liquid();
+}
+
+bool item::allows_speedloader( const itype_id &speedloader_id ) const
+{
+    return contents.allows_speedloader( speedloader_id );
 }
 
 bool item::can_reload_with( const itype_id &ammo ) const

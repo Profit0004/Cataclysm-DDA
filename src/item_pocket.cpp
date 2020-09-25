@@ -111,6 +111,7 @@ void pocket_data::load( const JsonObject &jo )
     optional( jo, was_loaded, "pocket_type", type, item_pocket::pocket_type::CONTAINER );
     optional( jo, was_loaded, "ammo_restriction", ammo_restriction );
     optional( jo, was_loaded, "item_restriction", item_id_restriction );
+    optional( jo, was_loaded, "allowed_speedloaders", allowed_speedloaders );
     if( !item_id_restriction.empty() ) {
         std::vector<itype_id> item_restriction;
         mandatory( jo, was_loaded, "item_restriction", item_restriction );
@@ -592,9 +593,16 @@ void item_pocket::casings_handle( const std::function<bool( item & )> &func )
 
 void item_pocket::handle_liquid_or_spill( Character &guy, const item *avoid )
 {
+    if( guy.is_npc() ) {
+        spill_contents( guy.pos() );
+        return;
+    }
+
     for( auto iter = contents.begin(); iter != contents.end(); ) {
         if( iter->made_of( phase_id::LIQUID ) ) {
-            liquid_handler::handle_liquid( *iter, avoid, 1 );
+            while( iter->charges > 0 && liquid_handler::handle_liquid( *iter, avoid, 1 ) ) {
+                // query until completely handled or explicitly canceled
+            }
             if( iter->charges == 0 ) {
                 iter = contents.erase( iter );
             } else {
@@ -1312,6 +1320,15 @@ bool item_pocket::is_standard_type() const
 bool item_pocket::airtight() const
 {
     return data->airtight;
+}
+
+bool item_pocket::allows_speedloader( const itype_id &speedloader_id ) const
+{
+    if( data->allowed_speedloaders.empty() ) {
+        return false;
+    } else {
+        return data->allowed_speedloaders.count( speedloader_id );
+    }
 }
 
 const pocket_data *item_pocket::get_pocket_data() const
